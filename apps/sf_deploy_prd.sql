@@ -8,8 +8,8 @@
 --   Driver script for building databases, schemas, tables, views etc
 --------------------------------------------------------------------------------------------
 
-
-
+ALTER SESSION SET LOG_LEVEL = INFO;
+ALTER SESSION SET TRACE_LEVEL = ON_EVENT;
 
 
 
