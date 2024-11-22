@@ -250,25 +250,5 @@ GRANT ROLE IDENTIFIER($warO) TO ROLE IDENTIFIER($sarC);
 GRANT ROLE IDENTIFIER($warO) TO ROLE IDENTIFIER($localfrAdmin);
 
 ---------------------------------------------------------------
--- END SCHEMA CREATION. OPTIONAL, CONTINUE TO TESTS BELOW.
+-- END SCHEMA CREATION. 
 ---------------------------------------------------------------
-
-
-
----------------------------------------------------------------
--- 100. TEST
----------------------------------------------------------------
--- Grant all three roles to your user.  Review what is visible.
--- grant role IDENTIFIER($pltfrAdmin) to user <your username>;
--- grant role IDENTIFIER($localfrAdmin) to user <your username>;
--- grant role IDENTIFIER($sarR) to user <your username>;
--- grant role IDENTIFIER($sarW) to user <your username>;
--- grant role IDENTIFIER($sarC) to user <your username>;
-
--- Uncomment, and use each role and notice what you can see in the database explorer:
--- use role IDENTIFIER($pltfrAdmin);
--- use role IDENTIFIER($localfrAdmin);
--- use role IDENTIFIER($sarC);
--- use role IDENTIFIER($sarW);
--- use role IDENTIFIER($sarR);
--- use role sysadmin;
