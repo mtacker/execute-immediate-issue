@@ -13,6 +13,8 @@ Go to [sf_deploy_prd.sql](apps/sf_deploy_prd.sql) to see my driver script. This 
 
 If I move all my ```EXECUTE IMMEDIATE FROM``` database/schema build commands from [sf_deploy_prd.sql](apps/sf_deploy_prd.sql) and put them in [main.yml](/.github/workflows/main.yml) instead, BOTH [pnc_sales_bronze_schema.sql](apps/pnc/snowflake_objects/databases/pnc_sales_db/schemas/bronze/pnc_sales_bronze_schema.sql) AND [pnc_sales_silver_schema.sql](pps/pnc/snowflake_objects/databases/pnc_sales_db/schemas/silver/pnc_sales_silver_schema.sql) will complete successfully!  Therefore I am certain this is not a syntax issue with my code.  
 
+## Successful  
+
 The issue seems to be some type of session or CLI confusion when using nested ```EXECUTE IMMEDIATE FROM``` to effect changes that involving a database or schema.  As noted, the issue does NOT occur when building tables/views etc.
 
 
