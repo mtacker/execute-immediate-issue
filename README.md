@@ -5,7 +5,7 @@ This small repo is for the benefit of Supraja at Snowflake Support to demonstrat
 
 The desire is to use Github Actions with "EXECUTE IMMEDIATE FROM" to orchestrate our deployments.  
 
-I would like to have all my ```EXECUTE IMMEDIATE FROM``` live in a single driver script. However, when attempting to create a new database/schema the first EXECUTE IMMEDIATE FROM call succeeds, but the next one fails. Go to [sf_deploy_prd.sql](apps/sf_deploy_prd.sql) to see my driver script. This also contains the errors that occur on their respective lines.  Interestingly, calls to build tables, views or any other kind of database object can be called sequentially from within my driver script with no issue. It only seems to be when building databases and/or schemas that this occurs. 
+I would like to have all my ```EXECUTE IMMEDIATE FROM``` commands for all our DDL operations live in a single driver script. However, when attempting to create a new database/schema the first EXECUTE IMMEDIATE FROM call succeeds, but the next one fails. Go to [sf_deploy_prd.sql](apps/sf_deploy_prd.sql) to see my driver script. This also contains the errors that occur on their respective lines.  Interestingly, calls to build tables, views or any other kind of database object can be called sequentially from within my driver script with no issue. It only seems to be when building databases and/or schemas that this occurs. 
 
 ## Successful (but not optimal) workaround:  
 
