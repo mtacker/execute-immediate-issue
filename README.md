@@ -21,3 +21,4 @@ When a commit to the repository happens Github Actions [triggers main.yml](/.git
 
 If I move all my ```EXECUTE IMMEDIATE FROM``` schema build commands from [sf_deploy_prd.sql](apps/sf_deploy_prd.sql) into [main.yml](/.github/workflows/main.yml) instead, BOTH [tags_schema.sql](apps/adm/snowflake_objects/databases/adm_platform_db/schemas/tags/tags_schema.sql) AND [alerts_schema.sql](apps/adm/snowflake_objects/databases/adm_platform_db/schemas/alerts/alerts_schema.sql) will complete successfully!  Therefore I am certain this is not a syntax issue with my code.  The issue seems to be some type of session or CLI confusion when using nested ```EXECUTE IMMEDIATE FROM``` to effect changes that involving a database or schema.  This issue does NOT occur when building tables/views etc.
 
+
