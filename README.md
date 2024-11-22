@@ -19,7 +19,7 @@ The issue seems to be some type of session or CLI confusion when using nested ``
 
 
 ## Details of failure
-- The goal is ...
+- Execution flow:  
 
 When a commit to the repository happens Github Actions [triggers main.yml](/.github/workflows/main.yml).  Then main.yml calls:  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[sf_deploy_prd.sql](apps/sf_deploy_prd.sql) calls:  
