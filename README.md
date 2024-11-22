@@ -1,53 +1,58 @@
-# execute-immediate-issue
-This small repo is for the benefit of Supraja at Snowflake Support to demonstrate the issue
+# Problems using EXECUTE IMMEDIATE FROM
 
-# Platform Prototype for Managed use of Snowflake 
+The desire is to use Github Actions with "EXECUTE IMMEDIATE FROM" to orchestrate our deployments.  
 
-Demonstrating:  
-- RBAC model fully fleshed out using Functional Roles.  
-- 5 hypothetical databases used to illustrate managed security across multiple teams (via Functional Roles).  
-- Use of Github Actions and the Snowflake CLI for CI/CD - (evented by commits to branches).  
-- Automated deployments to multiple Snowflake Accounts (dev/qa/prod) using Github Secrets.  
-- Orchestration using Snowflake's new ```EXECUTE IMMEDIATE FROM``` feature.  
-- Git Integration with Snowflake using a local stage.  
+The issue seems to be around the way in which I'm parameterizing my scripts using SET statements.  My SET statements create variables to give us a level  of abstraction that will support a robust orchestration and deployment model in a multi-user/multi-team environment.
 
-Deployment model is based on Snowflake's most recent recommended approach:  
-See [The Future Of DevOps With Snowflake](https://www.youtube.com/watch?v=k20yLpW8-xU).  
-  
-## ToDo  
-Add:  
-- Snowflake Managed Schemas  
-- Framework for notifications and alerts  
-- Basic framework for tagging  
-- Example of how to do masking (column/row)  
----  
+Below are the two different approaches I've tried
 
-## Git Integration with Snowflake using a local stage 
-https://docs.snowflake.com/en/developer-guide/git/git-overview
+## Approach 1
+- Include SET variables WITH the build code:
 
-<img src=".images/git_integration.png" alt="Git Integration with Snowflake using a local stage" width="600" height="600">
+A commit to Github [triggers main.yml](/.github/workflows/main.yml).  main.yml calls:  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[sf_deploy_prd.sql](apps/sf_deploy_prd.sql) calls:  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[tags_build.sql](apps/adm/snowflake_objects/databases/adm_platform_db/schemas/tags/tags_build.sql)  << Fails Here  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[alerts_build.sql](apps/adm/snowflake_objects/databases/adm_platform_db/schemas/alerts/alerts_build.sql)  
 
----  
-## Segregation of Access Using RBAC    
 
-![RBAC Model](.images/rbac_diagram.png)  
 
----
 
-## Proposed Directory Structure 
 
-Our proposed directory structure is inpired by the Snowflake Object Hierarchy: 
-![Snowflake Object Hierarchy](./.images/snowflakeObjectHierarchy.png)
+![alt text](.images/include_vars.png)
 
-For Example:  
-```
-# Change ./apps/[YOUR SEGMENT]/{snowflake_objects/databases/[YOUR DATABASE]/schemas/...
-mkdir -p ./apps/adm/{snowflake_objects/databases/adm_platform_db/schemas/alerts/{external_tables,file_formats,masking_policies,pipes,stages,streams,tables,tasks,views,sequences,stored_procedures,udf,streams,tasks},scripts};  
-mkdir -p ./apps/adm/{snowflake_objects/databases/adm_platform_db/schemas/tags/{external_tables,file_formats,masking_policies,pipes,stages,streams,tables,tasks,views,sequences,stored_procedures,udf,streams,tasks},scripts};  
-```
+## Approach 2
+- Separate SET variables FROM the build code:
 
-![Resulting Directory Structure](./.images/directoryStructure.png)  
- 
+A commit to Github [triggers main.yml](/.github/workflows/main.yml).  main.yml calls:  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[sf_deploy_prd.sql](apps/sf_deploy_prd.sql) calls:  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[tags_schema.sql](apps/adm/snowflake_objects/databases/adm_platform_db/schemas/tags/tags_schema.sql) calls:  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[build_schema.sql](apps/build_schema.sql)  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[alerts_schema.sql](apps/adm/snowflake_objects/databases/adm_platform_db/schemas/alerts/alerts_schema.sql) calls:  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[build_schema.sql](apps/build_schema.sql)  << Fails here  
 
-![Our Current Directory Structure](./.images/actualDirectoryStructure.png) 
+![alt text](.images/separate_vars.png)
 
+## Successful workaround for failing APPROACH 1 & 2
+
+Move EXECUTE IMMEDIATE FROM schema builds from our preferred [sf_deploy_prd.sql](apps/sf_deploy_prd.sql) build script to [main.yml](/.github/workflows/main.yml).  Schemas build if I put EIF calls there! But this separates our build steps and forces us to update 3 places (dev/qa/prd) in main.yml for any new schema. Not ideal.
+
+## Latest issue with EXECUTE IMMEDIATE FROM
+
+In this new (occassional) error, Snowflake seems to forget the schema location of our stage repository.
+'.DEPLOY.SNOWFLAKE_GIT_REPO' is the actual location of our local git stage.  But for some reason all of the sudden SF might think it's located in 'PNC_SALES_DB.BRONZE.SNOWFLAKE_GIT_REPO'. "PNC_SALES_DB.BRONZE" is the schema being operated on in the current (failing) step.  
+
+NOTE> Line 56 in the error is now line 67 in the failing script: [sf_deploy_prd.sql](apps/sf_deploy_prd.sql).  It's now line 67 because I added the error text and another FETCH call to see if I can "remind" EXECUTE IMMEDIATE FROM of the correct stage location.  
+
+And just now I had to add a "reminder" of the location of the git stage before the following line that was failing ([note the FETCH above line 70](apps/sf_deploy_prd.sql)). But the last two EXECUTE IMMEDIATE FROM statements in that script finished successfully.  Very odd.  
+
+![alt text](.images/PNC_SALES_DB.BRONZE.SNOWFLAKE_GIT_REPO.png)
+
+
+
+## Logging question
+
+I need at least basic logging with this EXECUTE IMMEDIATE FROM approach -both fail & success. I get a good clue most times where to look on a failure. But with successes (especially nested EIF calls), all I get is the name of the last step that succeeded. 
+
+Maybe Snowflake Trail? I have not had a chance to see if that gives me anything useful in this case.
+
+Thanks for the assist and any comments about any of this! Especially about my overall approach!
