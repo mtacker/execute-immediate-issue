@@ -8,8 +8,17 @@
 --   Driver script for building databases, schemas, tables, views etc
 --------------------------------------------------------------------------------------------
 
--- SCHEMAS     
 
+
+
+
+
+
+
+
+
+-- SCHEMAS     
+EXECUTE IMMEDIATE FROM @SNOWFLAKE_GIT_REPO/branches/master/apps/pnc/snowflake_objects/databases/pnc_sales_db/schemas/bronze/pnc_sales_bronze_schema.sql;  
 --------------------------------------------------------------------------------------------
 -- Where EXECUTE IMMEDIATE FROM fails
 --------------------------------------------------------------------------------------------
@@ -24,15 +33,10 @@
 -- │ Cannot perform operation. This session does not have a current database.     │
 -- │ Call 'USE DATABASE', or use a qualified name.   
 -- *******************************************************************************
--- EXECUTE IMMEDIATE FROM @SNOWFLAKE_GIT_REPO/branches/master/apps/adm/snowflake_objects/databases/adm_platform_db/schemas/alerts/alerts_schema.sql;
---------------------------------------------------------------------------------------------
-
-EXECUTE IMMEDIATE FROM @SNOWFLAKE_GIT_REPO/branches/master/apps/pnc/snowflake_objects/databases/pnc_sales_db/schemas/bronze/pnc_sales_bronze_schema.sql;  
 EXECUTE IMMEDIATE FROM @SNOWFLAKE_GIT_REPO/branches/master/apps/pnc/snowflake_objects/databases/pnc_sales_db/schemas/silver/pnc_sales_silver_schema.sql;  
 EXECUTE IMMEDIATE FROM @SNOWFLAKE_GIT_REPO/branches/master/apps/pnc/snowflake_objects/databases/pnc_sales_db/schemas/gold/pnc_sales_gold_schema.sql;  
 
 -- TABLES
-
 EXECUTE IMMEDIATE FROM @SNOWFLAKE_GIT_REPO/branches/master/apps/pnc/snowflake_objects/databases/pnc_sales_db/schemas/bronze/tables/customer.sql;
 EXECUTE IMMEDIATE FROM @SNOWFLAKE_GIT_REPO/branches/master/apps/pnc/snowflake_objects/databases/pnc_sales_db/schemas/bronze/tables/product.sql;
 EXECUTE IMMEDIATE FROM @SNOWFLAKE_GIT_REPO/branches/master/apps/pnc/snowflake_objects/databases/pnc_sales_db/schemas/bronze/tables/orders.sql;
