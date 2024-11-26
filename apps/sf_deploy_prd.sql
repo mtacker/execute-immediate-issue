@@ -8,9 +8,9 @@
 --   Driver script for building databases, schemas, tables, views etc
 --------------------------------------------------------------------------------------------
 
-ALTER ACCOUNT SET EVENT_TABLE = PNC_SALES_DB.LOGGING.tutorial_event_table;
-ALTER SESSION SET LOG_LEVEL = INFO;
-ALTER SESSION SET TRACE_LEVEL = ON_EVENT;
+-- ALTER ACCOUNT SET EVENT_TABLE = PNC_SALES_DB.LOGGING.tutorial_event_table;
+-- ALTER SESSION SET LOG_LEVEL = INFO;
+-- ALTER SESSION SET TRACE_LEVEL = ON_EVENT;
 -- TRUNCATE TABLE PNC_SALES_DB.LOGGING.tutorial_event_table;
 
 
