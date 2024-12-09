@@ -23,7 +23,7 @@ EXECUTE IMMEDIATE FROM @SNOWFLAKE_GIT_REPO/branches/master/apps/pnc/snowflake_ob
 --------------------------------------------------------------------------------------------
 -- Where EXECUTE IMMEDIATE FROM fails
 --------------------------------------------------------------------------------------------
--- EXECUTE IMMEDIATE FROM @SNOWFLAKE_GIT_REPO/branches/master/apps/adm/snowflake_objects/databases/adm_platform_db/schemas/tags/tags_schema.sql;
+-- pnc_sales_bronze_schema.sql succeeds, but pnc_sales_silver_schema.sql fails
 
 -- First 'EXECUTE IMMEDIATE FROM' succeeds, but the Second statement fails with error:
 --

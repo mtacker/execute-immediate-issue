@@ -5,9 +5,9 @@ This small repo is for the benefit of Supraja at Snowflake Support to demonstrat
 
 The desire is to use Github Actions with "EXECUTE IMMEDIATE FROM" to orchestrate our deployments.  
 
-I would like to have all my ```EXECUTE IMMEDIATE FROM``` commands for all our DDL operations live in a single driver script. However, when attempting to create a new database or schema the first EXECUTE IMMEDIATE FROM call succeeds, but the second one fails. 
+I would like to have all my ```EXECUTE IMMEDIATE FROM``` commands for all our DDL operations live in a single driver script. However, when attempting to create a new database or schema the first EXECUTE IMMEDIATE FROM call succeeds, but the second one fails. If I flip my lines around the same thing happens, first succeeds, second still fails.
 
-Go to [sf_deploy_prd.sql](apps/sf_deploy_prd.sql) to see my driver script. This also contains the errors that occur on their respective lines.  Interestingly, calls to build tables, views or any other kind of database object can be called sequentially from within my driver script with no issue. It only seems to be when building databases and/or schemas that this occurs. 
+Go to [sf_deploy_prd.sql](apps/sf_deploy_prd.sql) to see my driver script. I've added comments whein sf_deploy_prd.sql to indicate where re the errors occur. Interestingly, calls to build tables, views or any other kind of database object can be fun sequentially from within my driver script just fine. It only when running my scripts that build databases and/or schemas that this issue occurs. And I suspect even further that the issue has to do with the extensive use of SET statements in the failing scripts.  Note> this is NOT an issue with syntax in my schema build scripts. I know that because I can run them all sequentially from main.yml and everythign runs just fine! I can build roles, schemas and databases without issue that way!  This is in no way a show-stopper from using ```EXECUTE IMMEDIATE FROM``` to do my deployments. It's just an inconvenience because I'm going to have to shove all my 'schema build' scripts in main.yml. Just not optimal as noted below:  
 
 ## Successful (but not optimal) workaround  
 
