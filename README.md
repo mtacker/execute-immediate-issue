@@ -18,10 +18,24 @@ If I move all my ```EXECUTE IMMEDIATE FROM``` database/schema build commands fro
 The issue seems to be some type of session or CLI confusion when using nested ```EXECUTE IMMEDIATE FROM``` to effect changes that involving a database or schema.  As noted, the issue does NOT occur when building tables/views etc.
 
 
-## Details of failure
-- Execution flow:  
+## Execution Flow
 
-When a commit to the repository happens Github Actions triggers [main.yml](/.github/workflows/main.yml).  
+The whole purpose of this is to be able to do deployments to any of our 3 Snowflake Accounts.  For instance, let's say these are the Snowflake accounts listed in my connections.toml file:  
+
+[DEV]
+account = "b98765.us-east-1"
+
+[QA]
+account = "a12345.us-east-1"
+
+[PRD]
+account = "x87654.us-east-1"
+
+
+Then commits to these named branches will cause Github Actions to trigger [main.yml](/.github/workflows/main.yml) and build against the Snowflake Account that matches the branch name (DEV/QA/PRD).  
+NOTE> There are other minor setups not listed here such as adding your Github secrets to provide account and credential details as well as setting up the local (snowflake) repo. 
+
+The execution flow within this repo will be:  
 main.yml then calls:  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[sf_deploy_prd.sql](apps/sf_deploy_prd.sql) calls:  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[pnc_sales_bronze_schema.sql](apps/pnc/snowflake_objects/databases/pnc_sales_db/schemas/bronze/pnc_sales_bronze_schema.sql) calls:  
